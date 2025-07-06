@@ -2,19 +2,20 @@
   # Build command
   command = "npm run build:prod"
   
-  # Directory to publish (Angular builds to dist/customer-manager by default)
+  # Directory to publish - Angular builds to dist/customer-manager
   publish = "dist/customer-manager"
+
+# Netlify Angular Runtime Plugin configuration
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"
+  ANGULAR_CLI_VERSION = "19"
 
 # Redirect rules for Angular SPA routing
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-# Optional: Environment variables for production
-[build.environment]
-  NODE_VERSION = "18"
-  NPM_VERSION = "9"
 
 # Optional: Headers for security and performance
 [[headers]]
