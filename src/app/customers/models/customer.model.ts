@@ -44,6 +44,10 @@ export class Customer {
   status!: 'active' | 'inactive' | 'pending';
   revenue!: number;
   notes!: string;
+  
+  // Location coordinates (optional - for map view)
+  latitude?: number;
+  longitude?: number;
 
   get fullName(): string {
     return `${this.firstName} ${this.lastName}`;
