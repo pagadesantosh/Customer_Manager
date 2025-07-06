@@ -1,7 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { Subject, filter, takeUntil } from 'rxjs';
+import { CustomerActions } from '../../customers/store';
+import * as CustomerSelectors from '../../customers/store/customer.selectors';
 
 @Component({
   selector: 'app-header',
@@ -322,7 +325,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   showPageHeader = false;
   private destroy$ = new Subject<void>();
   
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private store: Store
+  ) {}
   
   ngOnInit(): void {
     // Check initial route
@@ -336,6 +342,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
       )
       .subscribe((event: NavigationEnd) => {
         this.checkRoute(event.url);
+      });
+
+    // Subscribe to current view mode from store
+    this.store.select(CustomerSelectors.selectViewMode)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(viewMode => {
+        this.currentView = viewMode;
       });
   }
   
@@ -351,7 +364,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   
   setView(view: 'card' | 'list' | 'map'): void {
     this.currentView = view;
-    // Emit event or call service to change view
-    console.log('View changed to:', view);
+    // Dispatch action to update view mode in store
+    this.store.dispatch(CustomerActions.switchViewMode({ viewMode: view }));
   }
 }
