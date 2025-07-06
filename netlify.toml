@@ -2,8 +2,8 @@
   # Build command
   command = "npm run build:prod"
   
-  # Directory to publish - Angular builds to dist/customer-manager
-  publish = "dist/customer-manager"
+  # Directory to publish - Angular 17+ with application builder outputs to browser subdirectory
+  publish = "dist/customer-manager/browser"
 
 # Netlify Angular Runtime Plugin configuration
 [build.environment]
