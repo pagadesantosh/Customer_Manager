@@ -181,5 +181,83 @@ export const customerReducer = createReducer(
     ...state,
     loadingFilterOptions: false,
     filterOptionsError: error
+  })),
+
+  // Add customer
+  on(CustomerActions.addCustomer, (state): CustomerState => ({
+    ...state,
+    loading: true,
+    error: null
+  })),
+
+  on(CustomerActions.addCustomerSuccess, (state, { customer }): CustomerState => {
+    const updatedCustomers = [...state.customers, customer];
+    const filteredCustomers = applyFilters(updatedCustomers, state.filters);
+    return {
+      ...state,
+      customers: updatedCustomers,
+      filteredCustomers,
+      loading: false,
+      error: null
+    };
+  }),
+
+  on(CustomerActions.addCustomerFailure, (state, { error }): CustomerState => ({
+    ...state,
+    loading: false,
+    error
+  })),
+
+  // Update customer
+  on(CustomerActions.updateCustomer, (state): CustomerState => ({
+    ...state,
+    loading: true,
+    error: null
+  })),
+
+  on(CustomerActions.updateCustomerSuccess, (state, { customer }): CustomerState => {
+    const updatedCustomers = state.customers.map(c => 
+      c.id === customer.id ? customer : c
+    );
+    const filteredCustomers = applyFilters(updatedCustomers, state.filters);
+    return {
+      ...state,
+      customers: updatedCustomers,
+      filteredCustomers,
+      loading: false,
+      error: null
+    };
+  }),
+
+  on(CustomerActions.updateCustomerFailure, (state, { error }): CustomerState => ({
+    ...state,
+    loading: false,
+    error
+  })),
+
+  // Delete customer
+  on(CustomerActions.deleteCustomer, (state): CustomerState => ({
+    ...state,
+    loading: true,
+    error: null
+  })),
+
+  on(CustomerActions.deleteCustomerSuccess, (state, { customerId }): CustomerState => {
+    const updatedCustomers = state.customers.filter(c => c.id !== customerId);
+    const filteredCustomers = applyFilters(updatedCustomers, state.filters);
+    return {
+      ...state,
+      customers: updatedCustomers,
+      filteredCustomers,
+      loading: false,
+      error: null,
+      selectedCustomerId: state.selectedCustomerId === customerId ? null : state.selectedCustomerId
+    };
+  }),
+
+  on(CustomerActions.deleteCustomerFailure, (state, { error }): CustomerState => ({
+    ...state,
+    loading: false,
+    error
   }))
 );

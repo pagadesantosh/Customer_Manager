@@ -5,11 +5,14 @@ import { Store } from '@ngrx/store';
 import { Subject, filter, takeUntil } from 'rxjs';
 import { CustomerActions } from '../../customers/store';
 import * as CustomerSelectors from '../../customers/store/customer.selectors';
+import { CustomerFormModalComponent } from '../../customers/components/customer-form-modal.component';
+import { Customer } from '../../customers/models';
+import { CustomerModalService } from '../services/customer-modal.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, CustomerFormModalComponent],
   template: `
     <header class="main-header">
       <!-- Top Navigation Bar -->
@@ -55,13 +58,22 @@ import * as CustomerSelectors from '../../customers/store/customer.selectors';
               <span class="toggle-icon">🗺</span>
               Map View
             </button>
-            <button class="new-customer-btn">
+            <button class="new-customer-btn" (click)="onAddCustomer()">
               <span class="btn-icon">+</span>
               New Customer
             </button>
           </div>
         </div>
       </div>
+      
+      <!-- Customer Form Modal -->
+      <app-customer-form-modal
+        [isVisible]="showModal"
+        [customer]="selectedCustomer"
+        [isLoading]="isLoading"
+        (close)="onCloseModal()"
+        (save)="onSaveCustomer($event)">
+      </app-customer-form-modal>
     </header>
   `,
   styles: [`
@@ -323,11 +335,15 @@ import * as CustomerSelectors from '../../customers/store/customer.selectors';
 export class HeaderComponent implements OnInit, OnDestroy {
   currentView: 'card' | 'list' | 'map' = 'card';
   showPageHeader = false;
+  showModal = false;
+  selectedCustomer: Customer | null = null;
+  isLoading = false;
   private destroy$ = new Subject<void>();
   
   constructor(
     private router: Router,
-    private store: Store
+    private store: Store,
+    private customerModalService: CustomerModalService
   ) {}
   
   ngOnInit(): void {
@@ -350,6 +366,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
       .subscribe(viewMode => {
         this.currentView = viewMode;
       });
+
+    // Subscribe to loading state
+    this.store.select(CustomerSelectors.selectLoading)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(loading => {
+        this.isLoading = loading;
+      });
+
+    // Listen for edit customer requests
+    this.customerModalService.editCustomer$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(customer => {
+        this.onEditCustomer(customer);
+      });
   }
   
   ngOnDestroy(): void {
@@ -366,5 +396,35 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.currentView = view;
     // Dispatch action to update view mode in store
     this.store.dispatch(CustomerActions.switchViewMode({ viewMode: view }));
+  }
+
+  onAddCustomer(): void {
+    this.selectedCustomer = null;
+    this.showModal = true;
+  }
+
+  onEditCustomer(customer: Customer): void {
+    this.selectedCustomer = customer;
+    this.showModal = true;
+  }
+
+  onCloseModal(): void {
+    this.showModal = false;
+    this.selectedCustomer = null;
+  }
+
+  onSaveCustomer(customerData: Partial<Customer>): void {
+    if (this.selectedCustomer) {
+      // Update existing customer
+      this.store.dispatch(CustomerActions.updateCustomer({ 
+        customer: customerData as Customer 
+      }));
+    } else {
+      // Add new customer
+      this.store.dispatch(CustomerActions.addCustomer({ 
+        customer: customerData 
+      }));
+    }
+    this.onCloseModal();
   }
 }

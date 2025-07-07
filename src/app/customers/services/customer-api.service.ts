@@ -128,4 +128,88 @@ export class CustomerApiService {
       })
     );
   }
+
+  addCustomer(customer: Partial<Customer>): Observable<Customer> {
+    if (environment.useStaticData) {
+      // For static data environment, simulate API response
+      const newCustomer = new Customer();
+      Object.assign(newCustomer, {
+        id: Date.now(), // Generate a temporary ID
+        registrationDate: new Date(),
+        lastLogin: new Date(),
+        ...customer
+      });
+      return of(newCustomer);
+    }
+
+    const customerData = this.transformToApiFormat(customer);
+    return this.http.post<CustomerApiResponse>(this.baseUrl, customerData).pipe(
+      map(response => this.transformCustomer(response))
+    );
+  }
+
+  updateCustomer(customer: Customer): Observable<Customer> {
+    if (environment.useStaticData) {
+      // For static data environment, simulate API response
+      return of(customer);
+    }
+
+    const customerData = this.transformToApiFormat(customer);
+    return this.http.put<CustomerApiResponse>(`${this.baseUrl}/${customer.id}`, customerData).pipe(
+      map(response => this.transformCustomer(response))
+    );
+  }
+
+  deleteCustomer(customerId: number): Observable<void> {
+    if (environment.useStaticData) {
+      // For static data environment, simulate API response
+      return of(void 0);
+    }
+
+    return this.http.delete<void>(`${this.baseUrl}/${customerId}`);
+  }
+
+  private transformCustomer(customerData: CustomerApiResponse): Customer {
+    const customer = new Customer();
+    customer.id = customerData.id;
+    customer.firstName = customerData.first_name;
+    customer.lastName = customerData.last_name;
+    customer.email = customerData.email;
+    customer.phone = customerData.phone;
+    customer.company = customerData.company;
+    customer.jobTitle = customerData.job_title;
+    customer.state = customerData.state;
+    customer.city = customerData.city;
+    customer.address = customerData.address;
+    customer.zipCode = customerData.zip_code;
+    customer.avatarUrl = customerData.avatar_url;
+    customer.registrationDate = new Date(customerData.registration_date);
+    customer.lastLogin = new Date(customerData.last_login);
+    customer.status = customerData.status as 'active' | 'inactive' | 'pending';
+    customer.revenue = customerData.revenue;
+    customer.notes = customerData.notes;
+    return customer;
+  }
+
+  private transformToApiFormat(customer: Partial<Customer>): Partial<CustomerApiResponse> {
+    return {
+      id: customer.id,
+      first_name: customer.firstName,
+      last_name: customer.lastName,
+      email: customer.email,
+      phone: customer.phone,
+      company: customer.company,
+      job_title: customer.jobTitle,
+      state: customer.state,
+      city: customer.city,
+      address: customer.address,
+      zip_code: customer.zipCode,
+      avatar_url: customer.avatarUrl,
+      registration_date: customer.registrationDate?.toISOString(),
+      last_login: customer.lastLogin?.toISOString(),
+      status: customer.status,
+      revenue: customer.revenue,
+      notes: customer.notes
+    };
+  }
 }

@@ -6,6 +6,7 @@ import { Observable, Subject, takeUntil, map } from 'rxjs';
 import { Customer, CustomerFilters, ViewMode } from '../models';
 import { CustomerActions } from '../store';
 import * as CustomerSelectors from '../store/customer.selectors';
+import { CustomerModalService } from '../../shared/services/customer-modal.service';
 
 // Import standalone components
 import { CustomerCardComponent } from './customer-card.component';
@@ -89,7 +90,8 @@ import { CustomerFiltersComponent } from './customer-filters.component';
                   *ngFor="let customer of filteredCustomers$ | async; trackBy: trackByCustomerId"
                   [customer]="customer"
                   [isSelected]="(selectedCustomerId$ | async) === customer.id"
-                  (select)="onCustomerSelect($event)">
+                  (select)="onCustomerSelect($event)"
+                  (edit)="onEditCustomer($event)">
                 </app-customer-card>
               </div>
             </div>
@@ -394,7 +396,7 @@ export class CustomerContainerComponent implements OnInit, OnDestroy {
   error$: Observable<string | null>;
   customerStats$: Observable<any>;
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private customerModalService: CustomerModalService) {
     // Initialize observables
     this.filteredCustomers$ = this.store.select(CustomerSelectors.selectFilteredCustomers);
     this.currentFilters$ = this.store.select(CustomerSelectors.selectFilters);
@@ -460,6 +462,11 @@ export class CustomerContainerComponent implements OnInit, OnDestroy {
   onRetry(): void {
     this.store.dispatch(CustomerActions.loadCustomers());
     this.store.dispatch(CustomerActions.loadFilterOptions());
+  }
+
+  onEditCustomer(customer: Customer): void {
+    // Use the service to communicate with the header modal
+    this.customerModalService.openEditModal(customer);
   }
 
   // Utility methods

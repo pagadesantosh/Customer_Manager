@@ -3,3 +3,4 @@ export * from './customer-list.component';
 export * from './customer-map.component';
 export * from './customer-filters.component';
 export * from './customer-container.component';
+export * from './customer-form-modal.component';

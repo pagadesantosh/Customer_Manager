@@ -47,4 +47,46 @@ export class CustomerEffects {
       )
     )
   );
+
+  addCustomer$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CustomerActions.addCustomer),
+      mergeMap(action =>
+        this.customerApiService.addCustomer(action.customer).pipe(
+          map(customer => CustomerActions.addCustomerSuccess({ customer })),
+          catchError(error => of(CustomerActions.addCustomerFailure({ 
+            error: error.message || 'Failed to add customer' 
+          })))
+        )
+      )
+    )
+  );
+
+  updateCustomer$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CustomerActions.updateCustomer),
+      mergeMap(action =>
+        this.customerApiService.updateCustomer(action.customer).pipe(
+          map(customer => CustomerActions.updateCustomerSuccess({ customer })),
+          catchError(error => of(CustomerActions.updateCustomerFailure({ 
+            error: error.message || 'Failed to update customer' 
+          })))
+        )
+      )
+    )
+  );
+
+  deleteCustomer$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CustomerActions.deleteCustomer),
+      mergeMap(action =>
+        this.customerApiService.deleteCustomer(action.customerId).pipe(
+          map(() => CustomerActions.deleteCustomerSuccess({ customerId: action.customerId })),
+          catchError(error => of(CustomerActions.deleteCustomerFailure({ 
+            error: error.message || 'Failed to delete customer' 
+          })))
+        )
+      )
+    )
+  );
 }

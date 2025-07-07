@@ -30,6 +30,19 @@ export const CustomerActions = createActionGroup({
       states: string[], 
       companies: string[] 
     }>(),
-    'Load Filter Options Failure': props<{ error: string }>()
+    'Load Filter Options Failure': props<{ error: string }>(),
+
+    // Customer CRUD operations
+    'Add Customer': props<{ customer: Partial<Customer> }>(),
+    'Add Customer Success': props<{ customer: Customer }>(),
+    'Add Customer Failure': props<{ error: string }>(),
+    
+    'Update Customer': props<{ customer: Customer }>(),
+    'Update Customer Success': props<{ customer: Customer }>(),
+    'Update Customer Failure': props<{ error: string }>(),
+    
+    'Delete Customer': props<{ customerId: number }>(),
+    'Delete Customer Success': props<{ customerId: number }>(),
+    'Delete Customer Failure': props<{ error: string }>()
   }
 });
