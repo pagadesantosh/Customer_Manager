@@ -35,10 +35,10 @@ export class Customer {
   @Transform(({ value }) => value)
   avatarUrl!: string;
 
-  @Transform(({ value }) => new Date(value))
+  @Transform(({ value }) => value ? new Date(value) : new Date())
   registrationDate!: Date;
 
-  @Transform(({ value }) => new Date(value))
+  @Transform(({ value }) => value ? new Date(value) : new Date())
   lastLogin!: Date;
 
   status!: 'active' | 'inactive' | 'pending';
@@ -79,8 +79,8 @@ export interface CustomerApiResponse {
   address: string;
   zip_code: string;
   avatar_url: string;
-  registration_date: string;
-  last_login: string;
+  registration_date?: string; // Optional in JSON, will be generated if missing
+  last_login?: string; // Optional in JSON, will be generated if missing
   status: string;
   revenue: number;
   notes: string;

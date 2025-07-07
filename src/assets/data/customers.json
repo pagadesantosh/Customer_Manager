@@ -13,8 +13,6 @@
       "address": "19538 Old Military Road",
       "zip_code": "41514-2513",
       "avatar_url": "https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/male/512/25.jpg",
-      "registration_date": "2020-08-13T05:24:08.708Z",
-      "last_login": "2025-06-17T15:23:36.058Z",
       "status": "active",
       "revenue": 82469,
       "notes": "Colligo benevolentia curiositas degero conqueror corrupti animadverto absconditus demonstro terra."
@@ -32,8 +30,6 @@
       "address": "451 Victoria Place",
       "zip_code": "18294",
       "avatar_url": "https://avatars.githubusercontent.com/u/83915612",
-      "registration_date": "2023-11-20T04:42:56.657Z",
-      "last_login": "2025-07-03T00:26:02.217Z",
       "status": "inactive",
       "revenue": 61049,
       "notes": "Adamo audeo labore cohibeo viscus ars molestiae convoco."
@@ -43,7 +39,7 @@
       "first_name": "Gwen",
       "last_name": "Ortiz",
       "email": "gwen.ortiz@yahoo.com",
-      "phone": "923-585-9919 x6915",
+      "phone": "8669016661",
       "company": "Future Tech",
       "job_title": "Customer Quality Producer",
       "state": "North Carolina",
@@ -51,8 +47,6 @@
       "address": "67451 Kennith Viaduct",
       "zip_code": "40639-1587",
       "avatar_url": "https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/female/512/16.jpg",
-      "registration_date": "2024-09-01T06:52:00.601Z",
-      "last_login": "2025-06-30T05:22:03.539Z",
       "status": "active",
       "revenue": 6959,
       "notes": "Decumbo calco dolores circumvenio aequitas aiunt civitas aduro."
@@ -89,9 +83,7 @@
       "address": "682 Frami Fork",
       "zip_code": "22385",
       "avatar_url": "https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/female/512/17.jpg",
-      "registration_date": "2023-08-22T23:00:58.898Z",
-      "last_login": "2025-07-05T09:30:06.945Z",
-      "status": "inactive",
+      "status": "active",
       "revenue": 96085,
       "notes": "Damno aequitas coepi soluta."
     },

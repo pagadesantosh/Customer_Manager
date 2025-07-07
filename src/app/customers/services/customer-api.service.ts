@@ -47,27 +47,7 @@ export class CustomerApiService {
   }
 
   private transformCustomers(response: CustomerApiResponse[], filters?: CustomerFilters): Customer[] {
-    let customers = response.map(customerData => {
-      const customer = new Customer();
-      customer.id = customerData.id;
-      customer.firstName = customerData.first_name;
-      customer.lastName = customerData.last_name;
-      customer.email = customerData.email;
-      customer.phone = customerData.phone;
-      customer.company = customerData.company;
-      customer.jobTitle = customerData.job_title;
-      customer.state = customerData.state;
-      customer.city = customerData.city;
-      customer.address = customerData.address;
-      customer.zipCode = customerData.zip_code;
-      customer.avatarUrl = customerData.avatar_url;
-      customer.registrationDate = new Date(customerData.registration_date);
-      customer.lastLogin = new Date(customerData.last_login);
-      customer.status = customerData.status as 'active' | 'inactive' | 'pending';
-      customer.revenue = customerData.revenue;
-      customer.notes = customerData.notes;
-      return customer;
-    });
+    let customers = response.map(customerData => this.transformCustomer(customerData));
 
     // Apply client-side filtering when using static data
     if (environment.useStaticData && filters) {
@@ -183,12 +163,26 @@ export class CustomerApiService {
     customer.address = customerData.address;
     customer.zipCode = customerData.zip_code;
     customer.avatarUrl = customerData.avatar_url;
-    customer.registrationDate = new Date(customerData.registration_date);
-    customer.lastLogin = new Date(customerData.last_login);
+    
+    // Handle dates with fallbacks for missing data
+    customer.registrationDate = customerData.registration_date 
+      ? new Date(customerData.registration_date) 
+      : this.generateRandomPastDate(2020, 2025);
+    
+    customer.lastLogin = customerData.last_login 
+      ? new Date(customerData.last_login) 
+      : this.generateRandomPastDate(2023, 2025);
+    
     customer.status = customerData.status as 'active' | 'inactive' | 'pending';
     customer.revenue = customerData.revenue;
     customer.notes = customerData.notes;
     return customer;
+  }
+
+  private generateRandomPastDate(startYear: number, endYear: number): Date {
+    const start = new Date(startYear, 0, 1);
+    const end = new Date(endYear, 11, 31);
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
   }
 
   private transformToApiFormat(customer: Partial<Customer>): Partial<CustomerApiResponse> {
