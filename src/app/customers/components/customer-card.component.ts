@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Customer } from '../models';
 
 @Component({
@@ -53,7 +54,16 @@ import { Customer } from '../models';
         </div>
         <div class="customer-actions">
           <button type="button" 
-                  class="edit-button" 
+                  class="action-button view-orders-button" 
+                  (click)="onViewOrders($event)"
+                  title="View Customer Orders">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M3 2.5a2.5 2.5 0 0 1 5 0V3h4a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4v-.5zM4 4v9h8V4H4zm3.5 1.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H6a.5.5 0 0 1-.5-.5V6a.5.5 0 0 1 .5-.5h1.5z"/>
+            </svg>
+            Orders
+          </button>
+          <button type="button" 
+                  class="action-button edit-button" 
                   (click)="onEdit($event)"
                   title="Edit Customer">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -205,15 +215,14 @@ import { Customer } from '../models';
     .customer-actions {
       display: flex;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .edit-button {
+    .action-button {
       display: flex;
       align-items: center;
       gap: 6px;
       padding: 6px 12px;
-      background: #007bff;
-      color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
@@ -222,14 +231,29 @@ import { Customer } from '../models';
       transition: all 0.2s ease;
     }
 
-    .edit-button:hover {
-      background: #0056b3;
+    .action-button svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .view-orders-button {
+      background: #28a745;
+      color: white;
+    }
+
+    .view-orders-button:hover {
+      background: #1e7e34;
       transform: translateY(-1px);
     }
 
-    .edit-button svg {
-      width: 14px;
-      height: 14px;
+    .edit-button {
+      background: #007bff;
+      color: white;
+    }
+
+    .edit-button:hover {
+      background: #0056b3;
+      transform: translateY(-1px);
     }
     
     @media (max-width: 768px) {
@@ -265,6 +289,8 @@ export class CustomerCardComponent {
   @Output() select = new EventEmitter<Customer>();
   @Output() edit = new EventEmitter<Customer>();
 
+  constructor(private router: Router) {}
+
   onSelect(): void {
     this.select.emit(this.customer);
   }
@@ -272,6 +298,13 @@ export class CustomerCardComponent {
   onEdit(event: Event): void {
     event.stopPropagation(); // Prevent card selection when clicking edit
     this.edit.emit(this.customer);
+  }
+
+  onViewOrders(event: Event): void {
+    event.stopPropagation(); // Prevent card selection when clicking view orders
+    this.router.navigate(['/orders'], { 
+      queryParams: { customerId: this.customer.id } 
+    });
   }
 
   onImageError(event: Event): void {
