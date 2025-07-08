@@ -13,18 +13,21 @@ export const orderReducer = createReducer(
     error: null
   })),
 
-  on(OrderActions.loadOrdersSuccess, (state, { orders }) => ({
-    ...state,
-    orders,
-    filteredOrders: applyFiltersToOrders(orders, state.filters),
-    loading: false,
-    error: null,
-    pagination: {
-      ...state.pagination,
-      totalItems: orders.length,
-      totalPages: Math.ceil(orders.length / state.pagination.pageSize)
-    }
-  })),
+  on(OrderActions.loadOrdersSuccess, (state, { orders }) => {
+    const filteredOrders = applyFiltersToOrders(orders, state.filters);
+    return {
+      ...state,
+      orders,
+      filteredOrders,
+      loading: false,
+      error: null,
+      pagination: {
+        ...state.pagination,
+        totalItems: filteredOrders.length,
+        totalPages: Math.ceil(filteredOrders.length / state.pagination.pageSize)
+      }
+    };
+  }),
 
   on(OrderActions.loadOrdersFailure, (state, { error }) => ({
     ...state,
@@ -162,26 +165,34 @@ export const orderReducer = createReducer(
   // Filters
   on(OrderActions.updateFilters, (state, { filters }) => {
     const updatedFilters = { ...state.filters, ...filters };
+    const filteredOrders = applyFiltersToOrders(state.orders, updatedFilters);
     return {
       ...state,
       filters: updatedFilters,
-      filteredOrders: applyFiltersToOrders(state.orders, updatedFilters),
+      filteredOrders,
       pagination: {
         ...state.pagination,
-        currentPage: 1 // Reset to first page when filters change
+        currentPage: 1, // Reset to first page when filters change
+        totalItems: filteredOrders.length,
+        totalPages: Math.ceil(filteredOrders.length / state.pagination.pageSize)
       }
     };
   }),
 
-  on(OrderActions.clearFilters, (state) => ({
-    ...state,
-    filters: initialOrderState.filters,
-    filteredOrders: state.orders,
-    pagination: {
-      ...state.pagination,
-      currentPage: 1
-    }
-  })),
+  on(OrderActions.clearFilters, (state) => {
+    const filteredOrders = state.orders; // No filters means all orders
+    return {
+      ...state,
+      filters: initialOrderState.filters,
+      filteredOrders,
+      pagination: {
+        ...state.pagination,
+        currentPage: 1,
+        totalItems: filteredOrders.length,
+        totalPages: Math.ceil(filteredOrders.length / state.pagination.pageSize)
+      }
+    };
+  }),
 
   // View Mode
   on(OrderActions.setViewMode, (state, { viewMode }) => ({
@@ -210,6 +221,7 @@ export const orderReducer = createReducer(
       ...state.pagination,
       pageSize,
       currentPage: 1,
+      totalItems: state.filteredOrders.length,
       totalPages: Math.ceil(state.filteredOrders.length / pageSize)
     }
   })),

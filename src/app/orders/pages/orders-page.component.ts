@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, take, map } from 'rxjs/operators';
 
 import { Order, OrderFilters, OrderViewMode } from '../models';
 import * as OrderActions from '../store/order.actions';
@@ -615,6 +615,7 @@ export class OrdersPageComponent implements OnInit, OnDestroy {
   customerId: number | null = null;
   viewMode: OrderViewMode = 'card';
   viewModes: OrderViewMode[] = ['card', 'list', 'timeline'];
+  private currentPageInfo: any = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -645,6 +646,13 @@ export class OrdersPageComponent implements OnInit, OnDestroy {
           this.loadAllOrders();
         }
       });
+
+    // Subscribe to page info changes
+    this.currentPageInfo$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(pageInfo => {
+        this.currentPageInfo = pageInfo;
+      });
   }
 
   ngOnDestroy(): void {
@@ -655,6 +663,8 @@ export class OrdersPageComponent implements OnInit, OnDestroy {
   // Data loading methods
   loadAllOrders(): void {
     this.store.dispatch(OrderActions.loadOrders({}));
+    // Reset pagination to first page when loading all orders
+    this.store.dispatch(OrderActions.setPage({ page: 1 }));
   }
 
   loadCustomerOrders(customerId: number): void {
@@ -662,6 +672,8 @@ export class OrdersPageComponent implements OnInit, OnDestroy {
       filters: { customerIds: [customerId] } 
     }));
     this.store.dispatch(OrderActions.loadOrders({}));
+    // Reset pagination to first page when loading customer orders
+    this.store.dispatch(OrderActions.setPage({ page: 1 }));
   }
 
   retryLoad(): void {
@@ -735,18 +747,35 @@ export class OrdersPageComponent implements OnInit, OnDestroy {
 
   // Pagination methods
   previousPage(): void {
-    this.currentPageInfo$.pipe(takeUntil(this.destroy$)).subscribe(pageInfo => {
-      if (pageInfo.currentPage > 1) {
-        this.store.dispatch(OrderActions.setPage({ page: pageInfo.currentPage - 1 }));
-      }
-    });
+    if (this.currentPageInfo && this.currentPageInfo.currentPage > 1) {
+      this.store.dispatch(OrderActions.setPage({ page: this.currentPageInfo.currentPage - 1 }));
+    }
   }
 
   nextPage(): void {
-    this.currentPageInfo$.pipe(takeUntil(this.destroy$)).subscribe(pageInfo => {
-      if (pageInfo.currentPage < pageInfo.totalPages) {
-        this.store.dispatch(OrderActions.setPage({ page: pageInfo.currentPage + 1 }));
-      }
-    });
+    if (this.currentPageInfo && this.currentPageInfo.currentPage < this.currentPageInfo.totalPages) {
+      this.store.dispatch(OrderActions.setPage({ page: this.currentPageInfo.currentPage + 1 }));
+    }
+  }
+
+  // Additional pagination methods
+  goToPage(page: number): void {
+    if (this.currentPageInfo && page >= 1 && page <= this.currentPageInfo.totalPages) {
+      this.store.dispatch(OrderActions.setPage({ page }));
+    }
+  }
+
+  goToFirstPage(): void {
+    this.store.dispatch(OrderActions.setPage({ page: 1 }));
+  }
+
+  goToLastPage(): void {
+    if (this.currentPageInfo && this.currentPageInfo.totalPages > 0) {
+      this.store.dispatch(OrderActions.setPage({ page: this.currentPageInfo.totalPages }));
+    }
+  }
+
+  onPageSizeChange(pageSize: number): void {
+    this.store.dispatch(OrderActions.setPageSize({ pageSize }));
   }
 }
