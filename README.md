@@ -2,6 +2,10 @@
 
 A production-ready Angular 19 SPA for managing customer data with advanced filtering, NgRx state management, and modern architecture using standalone components.
 
+## 🌐 Live Demo
+
+**[View Live Application](https://customer-manager-santosh.netlify.app/)**
+
 ## Features
 
 - 🚀 **Angular 19** with standalone components
