@@ -15,7 +15,7 @@ export class CustomerApiService {
   getCustomers(filters?: CustomerFilters): Observable<Customer[]> {
     // Use static data in production
     if (environment.useStaticData) {
-      return this.http.get<{customers: CustomerApiResponse[]}>('/assets/data/customers.json').pipe(
+      return this.http.get<{customers: CustomerApiResponse[]}>(environment.customerDataFile).pipe(
         map(response => this.transformCustomers(response.customers, filters))
       );
     }
@@ -76,7 +76,7 @@ export class CustomerApiService {
 
   getUniqueStates(): Observable<string[]> {
     if (environment.useStaticData) {
-      return this.http.get<{customers: CustomerApiResponse[]}>('/assets/data/customers.json').pipe(
+      return this.http.get<{customers: CustomerApiResponse[]}>(environment.customerDataFile).pipe(
         map(response => {
           const states = [...new Set(response.customers.map(customer => customer.state))];
           return states.sort();
@@ -94,7 +94,7 @@ export class CustomerApiService {
 
   getUniqueCompanies(): Observable<string[]> {
     if (environment.useStaticData) {
-      return this.http.get<{customers: CustomerApiResponse[]}>('/assets/data/customers.json').pipe(
+      return this.http.get<{customers: CustomerApiResponse[]}>(environment.customerDataFile).pipe(
         map(response => {
           const companies = [...new Set(response.customers.map(customer => customer.company))];
           return companies.sort();

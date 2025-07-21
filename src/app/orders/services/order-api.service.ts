@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, delay, map, switchMap } from 'rxjs';
 import { Order, OrderFilters } from '../models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -75,7 +76,7 @@ export class OrderApiService {
     }
     
     // Fallback to loading from JSON if not in cache
-    return this.http.get<{customers: any[]}>('/assets/data/customers.json').pipe(
+    return this.http.get<{customers: any[]}>(environment.customerDataFile).pipe(
       map(response => {
         const customer = response.customers.find(c => parseInt(c.id) === customerId);
         if (customer) {
@@ -199,7 +200,7 @@ export class OrderApiService {
   }
 
   private loadCustomerData(): void {
-    this.http.get<{customers: any[]}>('/assets/data/customers.json').subscribe({
+    this.http.get<{customers: any[]}>(environment.customerDataFile).subscribe({
       next: (response) => {
         this.customersCache = response.customers.slice(0, 20); // Cache first 20 customers
       },
