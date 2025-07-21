@@ -70,3 +70,20 @@ When deploying to Netlify or other platforms, the production build will automati
 
 ## Error Resolution
 This setup resolves the HTTP failure during parsing error that was occurring when trying to load the large customer dataset in production environments.
+
+### Key Fix: Environment Configuration
+The critical fix was adding `fileReplacements` to the production build configuration in `angular.json`:
+
+```json
+"production": {
+  "fileReplacements": [
+    {
+      "replace": "src/environments/environment.ts",
+      "with": "src/environments/environment.prod.ts"
+    }
+  ],
+  // ... other production config
+}
+```
+
+This ensures that when building for production, Angular uses the production environment file which points to the smaller `customers-prod.json` file instead of the large `customers.json` file.
